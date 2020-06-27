@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  deploy-prod:
+    docker:
+      - image: circleci/node:7.10
+    steps:
+      - checkout
+      - run:
+          name: known_hosts sadness
+          command: ssh-keyscan -H $SITE_SSH_HOST >> ~/.ssh/known_hosts
+      - run:
+          name: pull
+          command: ssh "$SITE_SSH_USER@$SITE_SSH_HOST" "cd /var/www/site && git pull"
+
+workflows:
+  version: 2.1
+  just-pull-new-stuff:
+    jobs:
+      - deploy-prod:
+          filters:
+            branches:
+              only:
+                - master
